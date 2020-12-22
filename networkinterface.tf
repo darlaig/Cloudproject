@@ -39,25 +39,25 @@ resource "aws_eip_association" "pub2" {
   allocation_id = aws_eip.pub1_int.id
 }
 
-#Create network interface for bastion server and attached to it instance
+#Network interface for bastion server
 
 resource "aws_network_interface" "bastion_int" {
-  subnet_id       = aws_subnet.public.id
+  subnet_id       = aws_subnet.public1.id
   private_ips     = [var.public_network_int[2]]
   security_groups = [aws_security_group.bastion.id]
 }
+
+# EIP association  for bastion server
 
 resource "aws_eip" "bastion" {
   network_interface = aws_network_interface.bastion_int.id
   vpc = true
 }
 
-output "bastion_server_Eip" {
-  value = aws_eip.bastion.public_ip
-}
+
 
 resource "aws_eip_association" "bastion" {
-instance_id = "aws_instance.bastion_server.id"
+instance_id = aws_instance.bastion_server.id
 allocation_id = aws_eip.bastion.id
 }
 
