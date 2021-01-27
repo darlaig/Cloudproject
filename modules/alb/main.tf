@@ -1,13 +1,13 @@
 # Application load balancer 
 
 resource "aws_lb" "alb" {
-  name               = "darl-alb"
-  internal           = false
-  load_balancer_type = "application"
-  ip_address_type    = "ipv4"
+  name               = var.alb_attributes[0]
+  internal           = var.alb_attributes[1]
+  load_balancer_type = var.alb_attributes[2]
+  ip_address_type    = var.alb_attributes[3]
   security_groups    = [aws_security_group.lb_sg.id]
-  subnets = [ aws_subnet.public.id, aws_subnet.public1.id ]
-   
+  subnets            = [aws_subnet.public.id, aws_subnet.public1.id]
+
 
   tags = {
     Environment = "darl-production"
@@ -20,7 +20,7 @@ resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.alb.arn
   port              = "80"
   protocol          = "HTTP"
- 
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.webgroup.arn
@@ -40,12 +40,12 @@ resource "aws_lb_target_group" "webgroup" {
   }
 
 
-  name     = "darl-tg"
-  port     = 80
-  protocol = "HTTP"
+  name        = "darl-tg"
+  port        = 80
+  protocol    = "HTTP"
   target_type = "instance"
-  vpc_id   = aws_vpc.dalovpc.id
- }
+  vpc_id      = aws_vpc.dalovpc.id
+}
 
 
 # Target group attachment 
