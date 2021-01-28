@@ -57,7 +57,20 @@ resource "aws_route_table_association" "public" {
 
 
 
+########## Public Network interface for Web server 1 ##########
 
+resource "aws_network_interface" "public" {
+  for_each = var.public_subnets
+  /*for_each    = var.public_network_int */
+  subnet_id   = aws_subnet.public["public1"].id
+  private_ips = var.public_network_int[*]
+  /*private_ips     = [var.public_network_int[0]]*/
+  /*security_groups = [aws_security_group.allow_web.id] */
+
+  tags = {
+    Name = "darl-public ${each.value}"
+  }
+}
 
 
 

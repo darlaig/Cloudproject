@@ -25,15 +25,11 @@ variable "instance_type" {
 }
 
 variable "public_network_int" {
-  default     = ["10.0.0.13", "10.0.0.24", "10.0.0.29"]
+  default     = ["10.0.0.11", "10.0.0.12", "10.0.0.29"]
   type        = list(string)
   description = "network interface attached to web server instances & bastion server"
-
 }
 
-variable "private_network_int" {
-  default     = ["10.0.0.40", "10.0.0.58"]
-  type        = list(string)
-  description = "network interface attached to private servers"
-
+variable "public_subnet_id" {
+  
 }

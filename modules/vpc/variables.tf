@@ -35,6 +35,13 @@ variable "public_subnets" {
   description = "public subnet cidr blocks"
 }
 
+variable "public_network_int" {
+  default     = ["10.0.0.11","10.0.0.12","10.0.0.29"]
+  type        = list(string)
+  description = "network interface attached to web server instances & bastion server"
+}
+
+
 variable "private_subnets" {
   default     = {
     private1 = "10.0.0.32/28"
