@@ -1,4 +1,4 @@
-# Defining the VPC block and Internet gateway
+########### VPC block and Internet gateway ##########
 
 resource "aws_vpc" "dalovpc" {
   cidr_block = var.vpc_cidr
@@ -17,7 +17,7 @@ resource "aws_internet_gateway" "gw" {
 
 
 
-# Custom Public Route table
+############# Custom Public Route table ################
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.dalovpc.id
@@ -32,11 +32,6 @@ resource "aws_route_table" "public" {
   }
 }
 
-
-
-
-# 1st Public subnet and route table association
-
 resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.dalovpc.id
   for_each          = var.public_subnets
@@ -46,7 +41,6 @@ resource "aws_subnet" "public" {
     Name = "darl ${each.key}"
   }
 }
-
 
 
 resource "aws_route_table_association" "public" {
@@ -59,22 +53,22 @@ resource "aws_route_table_association" "public" {
 
 ########## Public Network interface for Web server 1 ##########
 
-resource "aws_network_interface" "public" {
-  for_each = var.public_subnets
-  /*for_each    = var.public_network_int */
-  subnet_id   = aws_subnet.public["public1"].id
-  private_ips = var.public_network_int[*]
-  /*private_ips     = [var.public_network_int[0]]*/
-  /*security_groups = [aws_security_group.allow_web.id] */
 
+
+resource "aws_network_interface" "web" {
+  for_each = var.web_interface
+  subnet_id   = aws_subnet.public["public1"].id
+  private_ips = [each.value]
+  /*security_groups = [aws_security_group.allow_web.id]
+*/
   tags = {
-    Name = "darl-public ${each.value}"
+    Name = "darl-public ${each.key}"
   }
 }
 
 
 
-# Eip & Nat gateway for private subnet internet access
+###### Eip & Nat gateway for private subnet internet access ####
 
 
 
@@ -99,7 +93,8 @@ resource "aws_nat_gateway" "gw" {
   }
 
 */
-# Custom private subnet route table
+
+############ Custom private subnet route table  ##############
 
 
 resource "aws_route_table" "private" {
@@ -118,7 +113,7 @@ resource "aws_route_table" "private" {
 
 
 
-################## private subnet & route table association ########################
+########### private subnet & route table association ########################
 
 
 resource "aws_subnet" "private" {

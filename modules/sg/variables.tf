@@ -11,3 +11,19 @@ variable "ssh_private" {
   type        = list(any)
   description = " ssh from bastion server to private subnet"
 }
+
+
+
+variable "web_interface" {
+  default     = {
+    web1 = "10.0.0.11"
+    web2 = "10.0.0.12"
+  }
+  type        = map
+  description = "network interface attached to web server instances"
+}
+
+/*
+variable "public_subnet" {}
+*/
+

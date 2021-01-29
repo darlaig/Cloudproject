@@ -3,15 +3,7 @@
 variable "vpc_id" {}
 */
 
-/*
-variable "public_subnet_id" {
- default = { 
-   public1 = "subnet-0583695c9bdc1e742"
-   public2 = "subnet-0afc85852eb771a57"
- }
-}
 
-*/
 
 
 variable "vpc_cidr" {
@@ -26,19 +18,22 @@ variable "availability_zone" {
 }
 
 
-variable "public_subnets" {
-  type = map
-  default = {
+variable "public_subnets"{
+   default =  {
     public1 = "10.0.0.0/28"
     public2 = "10.0.0.16/28"
-  }
-  description = "public subnet cidr blocks"
+    }
+    type = map
+    description = "public subnet"
 }
 
-variable "public_network_int" {
-  default     = ["10.0.0.11","10.0.0.12","10.0.0.29"]
-  type        = list(string)
-  description = "network interface attached to web server instances & bastion server"
+variable "web_interface" {
+  default     = {
+    web1 = "10.0.0.11"
+    web2 = "10.0.0.12"
+  }
+  type        = map
+  description = "network interface attached to web server instances"
 }
 
 

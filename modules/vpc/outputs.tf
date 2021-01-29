@@ -6,21 +6,10 @@ output "vpc_id" {
 
 /*
 output "public" {
-  value = aws_subnet.public["public1"].id
+  value = 
 }
+
 */
-
-output "public" {
-  value = {for i, k in aws_subnet.public: i => k.id}
-}
-
-output "private" {
-  value = {for i, k in aws_subnet.private: i => k.id}
-}
-
-
-
-
 
 /*
 output "private1" {

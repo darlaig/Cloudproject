@@ -27,13 +27,10 @@ terraform {
 }
 */
 
-
-
 module "devops_vpc" {
   source = "../modules/vpc"
  
 }
-
 
 module "web_sg" {
   source            = "../modules/sg"
