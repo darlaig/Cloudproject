@@ -50,6 +50,10 @@ module "web_server" {
 
 }
 
+module "dynamodb_table" {
+  source = "../modules/dynamodb"
+  
+}
 
 
 

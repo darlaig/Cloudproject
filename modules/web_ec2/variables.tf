@@ -8,14 +8,14 @@ variable "image_id" {
 
 variable "keyname" {
   default     = ["darldev", "darlbaston"]
-  type        = list(any)
+  type        = list(string)
   description = "keyname for ssh"
 
 }
 
 variable "availability_zone" {
   default = ["eu-west-1a", "eu-west-1b"]
-  type    = list(any)
+  type    = list(string)
 
 }
 
@@ -24,12 +24,11 @@ variable "instance_type" {
   type    = string
 }
 
-variable "public_network_int" {
-  default     = ["10.0.0.11", "10.0.0.12", "10.0.0.29"]
-  type        = list(string)
-  description = "network interface attached to web server instances & bastion server"
-}
+/*
+variable "public_subnet_id" {}
 
-variable "public_subnet_id" {
-  
-}
+*/
+
+variable "web_interface" {}
+
+

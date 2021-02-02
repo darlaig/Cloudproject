@@ -101,7 +101,7 @@ resource "aws_security_group" "bastion" {
 
 resource "aws_security_group" "allow_bastion" {
   name        = "allow_ssh"
-  description = "allow ssh from bastion svr"
+  description = "allow ssh from bastion server"
   vpc_id      = var.myvpc
 
   ingress {
@@ -124,26 +124,58 @@ resource "aws_security_group" "allow_bastion" {
   }
 }
 
+########## Public Network interface for Web server 1 ##########
 
 
-/*
-# Network interface for webserver 2
 
-resource "aws_network_interface" "web_public1" {
-  subnet_id       = aws_subnet.public1.id
-  private_ips     = [var.public_network_int[1]]
+resource "aws_network_interface" "web" {
+  for_each        = var.web_interface
+  subnet_id       = var.public_subnet_id
+  private_ips     = [each.value]
   security_groups = [aws_security_group.allow_web.id]
+
+  tags = {
+    Name = "darl-public ${each.key}"
+  }
 }
 
-*/
+
+############ Network interface for bastion server ##############
 
 
-#Network interface for bastion server
-
-/*
-resource "aws_network_interface" "bastion_int" {
-  subnet_id       = aws_subnet.public1.id
-  private_ips     = [var.public_network_int[2]]
+resource "aws_network_interface" "bastion" {
+  subnet_id       = var.public_subnet_mgt
+  private_ips     = var.bastion_interface[0].private_ip
   security_groups = [aws_security_group.bastion.id]
+
+  tags = {
+    Name = var.bastion_interface[0].name
+  }
 }
-*/
+
+
+################## Private network interface  ########################
+
+resource "aws_network_interface" "priv1" {
+  private_ips     = var.db_interface[0].private_ip
+  subnet_id       = var.private1_subnet_id
+  security_groups = [aws_security_group.allow_bastion.id]
+
+
+  tags = {
+    Name = var.db_interface[0].name
+  }
+}
+
+
+resource "aws_network_interface" "priv2" {
+  private_ips     = var.db_interface[1].private_ip
+  subnet_id       = var.private2_subnet_id
+  security_groups = [aws_security_group.allow_bastion.id]
+
+
+  tags = {
+    Name = var.db_interface[1].name
+  }
+}
+

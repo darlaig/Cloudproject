@@ -9,13 +9,16 @@ resource "aws_instance" "web1" {
   instance_type     = var.instance_type
   availability_zone = var.availability_zone[0]
   key_name          = var.keyname[0]
+  /*subnet_id         = var.public_subnet_id */
 
-/*
+
+
   network_interface {
-    network_interface_id = aws_network_interface.web_public.id
+    network_interface_id = var.web_interface
     device_index         = 0
-  }
-  */
+    }
+
+  
 
   user_data = file("apache_install.sh")
 
@@ -45,6 +48,7 @@ resource "aws_instance" "web2" {
   }
 }
 
+
 # Ec2 for Bastion server with a defined network interface
 
 resource "aws_instance" "bastion_server" {
@@ -63,28 +67,10 @@ resource "aws_instance" "bastion_server" {
   }
 }
 
-/*
-
-
-
 */
 
 
 
-
-########## Public Network interface for Web server 1 ##########
-
-resource "aws_network_interface" "web_public" {
-  for_each    = toset(var.public_network_int)
-  subnet_id   = var.public_subnet_id
-  private_ips = [each.value]
-  /*private_ips     = [var.public_network_int[0]]*/
-  security_groups = [aws_security_group.allow_web.id]
-
-  tags = {
-    Name = "darl-public ${each.value}"
-  }
-}
 
 /*
 ##### Elastic ip to web server public network interface ########

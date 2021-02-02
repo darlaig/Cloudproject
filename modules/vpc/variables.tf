@@ -18,31 +18,22 @@ variable "availability_zone" {
 }
 
 
-variable "public_subnets"{
-   default =  {
+variable "public_subnets" {
+  default = {
     public1 = "10.0.0.0/28"
     public2 = "10.0.0.16/28"
-    }
-    type = map
-    description = "public subnet"
-}
-
-variable "web_interface" {
-  default     = {
-    web1 = "10.0.0.11"
-    web2 = "10.0.0.12"
   }
-  type        = map
-  description = "network interface attached to web server instances"
+  type        = map(any)
+  description = "public subnet"
 }
 
 
 variable "private_subnets" {
-  default     = {
+  default = {
     private1 = "10.0.0.32/28"
     private2 = "10.0.0.48/28"
   }
-  type        = map
+  type        = map(any)
   description = "private subnet cidr blocks"
 }
 

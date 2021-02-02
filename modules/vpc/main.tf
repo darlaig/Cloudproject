@@ -51,20 +51,7 @@ resource "aws_route_table_association" "public" {
 
 
 
-########## Public Network interface for Web server 1 ##########
 
-
-
-resource "aws_network_interface" "web" {
-  for_each = var.web_interface
-  subnet_id   = aws_subnet.public["public1"].id
-  private_ips = [each.value]
-  /*security_groups = [aws_security_group.allow_web.id]
-*/
-  tags = {
-    Name = "darl-public ${each.key}"
-  }
-}
 
 
 
@@ -87,12 +74,6 @@ resource "aws_nat_gateway" "gw" {
   }
 }
 
-  /*
-  resource "aws_eip_association" "nat" {
-    allocation_id = aws_eip.nat.id
-  }
-
-*/
 
 ############ Custom private subnet route table  ##############
 
