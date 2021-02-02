@@ -1,7 +1,7 @@
 
 
 
-# Load balancer security group
+############### Load balancer security group ##############
 
 
 
@@ -31,7 +31,7 @@ resource "aws_security_group" "lb_sg" {
 }
 
 
-# Security group for web servers
+############### Security group for web servers ##############
 
 resource "aws_security_group" "allow_web" {
   name        = "web_traffic"
@@ -68,7 +68,7 @@ resource "aws_security_group" "allow_web" {
 
 
 
-####### Security group for bastion server
+############## Security group for bastion server ##############
 
 resource "aws_security_group" "bastion" {
   name        = "ssh-to-bastion"
@@ -95,16 +95,13 @@ resource "aws_security_group" "bastion" {
   }
 }
 
-
-
-
-# configure security group for private subnet
+############## security group for private subnet   ##################
 
 
 
 resource "aws_security_group" "allow_bastion" {
   name        = "allow_ssh"
-  description = "allow ssh from bastion svr"
+  description = "allow ssh from bastion server"
   vpc_id      = var.myvpc
 
   ingress {
@@ -127,125 +124,58 @@ resource "aws_security_group" "allow_bastion" {
   }
 }
 
+########## Public Network interface for Web server 1 ##########
 
 
 
-######   Public Network interface for Web server 1
-
-resource "aws_network_interface" "web_public" {
-  for_each    = toset(var.public_network_int)
-  subnet_id   = var.public_subnet_id
-  private_ips = [each.value]
-  /*private_ips     = [var.public_network_int[0]]*/
+resource "aws_network_interface" "web" {
+  for_each        = var.web_interface
+  subnet_id       = var.public_subnet_id
+  private_ips     = [each.value]
   security_groups = [aws_security_group.allow_web.id]
 
   tags = {
-    Name = "darl-public ${each.value}"
+    Name = "darl-public ${each.key}"
+  }
+}
+
+
+############ Network interface for bastion server ##############
+
+
+resource "aws_network_interface" "bastion" {
+  subnet_id       = var.public_subnet_mgt
+  private_ips     = var.bastion_interface[0].private_ip
+  security_groups = [aws_security_group.bastion.id]
+
+  tags = {
+    Name = var.bastion_interface[0].name
   }
 }
 
 
 ################## Private network interface  ########################
 
-resource "aws_network_interface" "priv" {
-  for_each        = toset(var.private_network_int)
-  private_ips     = [each.value]
-  subnet_id       = var.private_subnet_id
+resource "aws_network_interface" "priv1" {
+  private_ips     = var.db_interface[0].private_ip
+  subnet_id       = var.private1_subnet_id
   security_groups = [aws_security_group.allow_bastion.id]
 
 
   tags = {
-    Name = "darl-private ${each.value}"
+    Name = var.db_interface[0].name
   }
 }
 
 
-
-/*
-# Network interface for webserver 2
-
-resource "aws_network_interface" "web_public1" {
-  subnet_id       = aws_subnet.public1.id
-  private_ips     = [var.public_network_int[1]]
-  security_groups = [aws_security_group.allow_web.id]
-}
-
-*/
-
-
-#Network interface for bastion server
-
-/*
-resource "aws_network_interface" "bastion_int" {
-  subnet_id       = aws_subnet.public1.id
-  private_ips     = [var.public_network_int[2]]
-  security_groups = [aws_security_group.bastion.id]
-}
-
-*/
-
-
-
-
-
-/*
-
-########### 2nd Private network interface 
-
-resource "aws_network_interface" "priv1" {
-  subnet_id       = aws_subnet.priv2.id
-  private_ips     = [var.private_network_int[1]]
+resource "aws_network_interface" "priv2" {
+  private_ips     = var.db_interface[1].private_ip
+  subnet_id       = var.private2_subnet_id
   security_groups = [aws_security_group.allow_bastion.id]
+
+
+  tags = {
+    Name = var.db_interface[1].name
+  }
 }
 
-*/
-
-
-/*
-
-# Define / associate an elastic ip to web server public network interface
-
-resource "aws_eip" "pub_int" {
-  network_interface = aws_network_interface.web_public.id
-  vpc               = true
-
-}
-
-resource "aws_eip_association" "pub1" {
-  instance_id   = aws_instance.web1.id
-  allocation_id = aws_eip.pub_int.id
-}
-
-
-
-
-# Define / associate an elastic ip to web server2 instance
-
-resource "aws_eip" "pub1_int" {
-  network_interface = aws_network_interface.web_public1.id
-  vpc               = true
-}
-
-resource "aws_eip_association" "pub2" {
-  instance_id   = aws_instance.web2.id
-  allocation_id = aws_eip.pub1_int.id
-}
-
-
-
-# EIP association  for bastion server
-
-resource "aws_eip" "bastion" {
-  network_interface = aws_network_interface.bastion_int.id
-  vpc               = true
-}
-
-
-resource "aws_eip_association" "bastion" {
-  instance_id   = aws_instance.bastion_server.id
-  allocation_id = aws_eip.bastion.id
-}
-
-
-
-*/

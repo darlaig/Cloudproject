@@ -12,8 +12,13 @@ variable "instance_type" {
 variable "keyname" {
     default = "darlbaston"
     type    = string
-
 }
 
 variable "availability_zone" {}
 
+variable "private_network_int" {
+  default     = ["10.0.0.40", "10.0.0.60"]
+  type        = list(string)
+  description = "network interface attached to private servers"
+
+}

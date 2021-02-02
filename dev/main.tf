@@ -8,7 +8,7 @@ terraform {
   }
 }
 
-# Configure the AWS Provider
+###### AWS Provider ###########
 
 provider "aws" {
   region  = "eu-west-1"
@@ -27,30 +27,33 @@ terraform {
 }
 */
 
-
-
-module "devops_class_vpc" {
+module "devops_vpc" {
   source = "../modules/vpc"
- 
+
 }
-
-
 
 module "web_sg" {
-  source            = "../modules/sg"
-  myvpc             = module.devops_class_vpc.vpc_id
-  public_subnet_id  = module.devops_class_vpc.public
-  private_subnet_id = module.devops_class_vpc.subid
-  
+  source             = "../modules/sg"
+  myvpc              = module.devops_vpc.vpc_id
+  public_subnet_id   = module.devops_vpc.public
+  public_subnet_mgt  = module.devops_vpc.bastion
+  private1_subnet_id = module.devops_vpc.private1
+  private2_subnet_id = module.devops_vpc.private2
+
 }
 
 
+module "web_server" {
+  source           = "../modules/web_ec2"
+  
+  web_interface = module.web_sg.web1_interface
 
-  /*
-  public1_subnet_id =
-  private2_subnet_id =
-  */
+}
 
+module "dynamodb_table" {
+  source = "../modules/dynamodb"
+  
+}
 
 
 

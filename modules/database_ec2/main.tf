@@ -17,6 +17,21 @@ resource "aws_instance" "priv1" {
 }
 
 
+################## Private network interface  ########################
+
+resource "aws_network_interface" "priv" {
+  for_each        = toset(var.private_network_int)
+  private_ips     = [each.value]
+  subnet_id       = var.private_subnet_id
+  security_groups = [aws_security_group.allow_bastion.id]
+
+
+  tags = {
+    Name = "darl-private ${each.value}"
+  }
+}
+
+
 /*
 # Ec2 instance for the Database server with a defined network interface
 

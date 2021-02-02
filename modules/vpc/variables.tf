@@ -3,15 +3,7 @@
 variable "vpc_id" {}
 */
 
-/*
-variable "public_subnet_id" {
- default = { 
-   public1 = "subnet-0583695c9bdc1e742"
-   public2 = "subnet-0afc85852eb771a57"
- }
-}
 
-*/
 
 
 variable "vpc_cidr" {
@@ -27,20 +19,21 @@ variable "availability_zone" {
 
 
 variable "public_subnets" {
-  type = map
   default = {
     public1 = "10.0.0.0/28"
     public2 = "10.0.0.16/28"
   }
-  description = "public subnet cidr blocks"
+  type        = map(any)
+  description = "public subnet"
 }
 
+
 variable "private_subnets" {
-  default     = {
+  default = {
     private1 = "10.0.0.32/28"
     private2 = "10.0.0.48/28"
   }
-  type        = map
+  type        = map(any)
   description = "private subnet cidr blocks"
 }
 

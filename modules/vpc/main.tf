@@ -1,4 +1,4 @@
-# Defining the VPC block and Internet gateway
+########### VPC block and Internet gateway ##########
 
 resource "aws_vpc" "dalovpc" {
   cidr_block = var.vpc_cidr
@@ -17,7 +17,7 @@ resource "aws_internet_gateway" "gw" {
 
 
 
-# Custom Public Route table
+############# Custom Public Route table ################
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.dalovpc.id
@@ -32,11 +32,6 @@ resource "aws_route_table" "public" {
   }
 }
 
-
-
-
-# 1st Public subnet and route table association
-
 resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.dalovpc.id
   for_each          = var.public_subnets
@@ -46,7 +41,6 @@ resource "aws_subnet" "public" {
     Name = "darl ${each.key}"
   }
 }
-
 
 
 resource "aws_route_table_association" "public" {
@@ -61,7 +55,7 @@ resource "aws_route_table_association" "public" {
 
 
 
-# Eip & Nat gateway for private subnet internet access
+###### Eip & Nat gateway for private subnet internet access ####
 
 
 
@@ -80,13 +74,8 @@ resource "aws_nat_gateway" "gw" {
   }
 }
 
-  /*
-  resource "aws_eip_association" "nat" {
-    allocation_id = aws_eip.nat.id
-  }
 
-*/
-# Custom private subnet route table
+############ Custom private subnet route table  ##############
 
 
 resource "aws_route_table" "private" {
@@ -105,7 +94,7 @@ resource "aws_route_table" "private" {
 
 
 
-################## private subnet & route table association ########################
+########### private subnet & route table association ########################
 
 
 resource "aws_subnet" "private" {
