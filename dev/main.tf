@@ -44,11 +44,12 @@ module "web_sg" {
 
 
 module "web_server" {
-  source = "../modules/web_ec2"
+  source           = "../modules/web_ec2"
+  /*public_subnet_id = module.devops_vpc.public
+  */
   web_interface = module.web_sg.web1_interface
 
 }
-
 
 
 
