@@ -1,6 +1,6 @@
 ########### VPC block and Internet gateway ##########
 
-resource "aws_vpc" "dalovpc" {
+resource "aws_vpc" "darl_vpc" {
   cidr_block = var.vpc_cidr
 
   tags = {
@@ -8,19 +8,17 @@ resource "aws_vpc" "dalovpc" {
   }
 }
 resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.dalovpc.id
+  vpc_id = aws_vpc.darl_vpc.id
 
   tags = {
     Name = var.name[1]
   }
 }
 
-
-
 ############# Custom Public Route table ################
 
 resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.dalovpc.id
+  vpc_id = aws_vpc.darl_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -32,16 +30,17 @@ resource "aws_route_table" "public" {
   }
 }
 
+################## public subnet #########################
+
 resource "aws_subnet" "public" {
-  vpc_id            = aws_vpc.dalovpc.id
+  vpc_id            = aws_vpc.darl_vpc.id
   for_each          = var.public_subnets
   cidr_block        = each.value
-  availability_zone = var.availability_zone[0]
+  availability_zone = each.key
   tags = {
-    Name = "darl ${each.key}"
+    Name = "darl-${each.key}"
   }
 }
-
 
 resource "aws_route_table_association" "public" {
   for_each       = var.public_subnets
@@ -49,15 +48,7 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-
-
-
-
-
-
-###### Eip & Nat gateway for private subnet internet access ####
-
-
+########## Eip & Nat gateway for private subnet internet access ###########
 
 resource "aws_eip" "nat" {
   vpc = true
@@ -65,7 +56,7 @@ resource "aws_eip" "nat" {
 
 resource "aws_nat_gateway" "gw" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public["public1"].id
+  subnet_id     = aws_subnet.public["eu-west-1a"].id
 
   depends_on = [aws_internet_gateway.gw]
 
@@ -79,7 +70,7 @@ resource "aws_nat_gateway" "gw" {
 
 
 resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.dalovpc.id
+  vpc_id = aws_vpc.darl_vpc.id
 
   route {
     cidr_block     = "0.0.0.0/0"
@@ -92,19 +83,16 @@ resource "aws_route_table" "private" {
   }
 }
 
-
-
 ########### private subnet & route table association ########################
 
-
 resource "aws_subnet" "private" {
-  vpc_id            = aws_vpc.dalovpc.id
+  vpc_id            = aws_vpc.darl_vpc.id
   for_each          = var.private_subnets
   cidr_block        = each.value
-  availability_zone = var.availability_zone[1]
+  availability_zone = each.key
 
   tags = {
-    Name = "darl ${each.key}"
+    Name = "darl-${each.key}"
   }
 }
 

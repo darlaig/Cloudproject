@@ -4,61 +4,68 @@ terraform {
 
 # Ec2 instance for web server with a defined network interface
 
-resource "aws_instance" "web1" {
+resource "aws_instance" "app" {
+  count             = var.instance_count
   ami               = var.image_id
   instance_type     = var.instance_type
-  availability_zone = var.availability_zone[0]
-  key_name          = var.keyname[0]
-  /*subnet_id         = var.public_subnet_id */
-
-
-
-  network_interface {
-    network_interface_id = var.web_interface
-    device_index         = 0
-    }
-
+  key_name          = element(var.keyname, count.index)
+  #subnet_id         = element(var.public_subnet_ids, count.index)
+  #security_groups   = var.security_groups
   
+  availability_zone = var.azs[count.index % length(var.azs)]
+
+   network_interface {
+    network_interface_id = element(var.web_interface, count.index)
+    device_index         = 0
+  }
+
 
   user_data = file("apache_install.sh")
 
   tags = {
-    Name = "darl-webserver"
+    Name = "darl-webapp-${count.index+1}"
   }
 }
 
-/*
+
+
 # Ec2 instance for web server2 with a defined network interface
+
+/*
 
 resource "aws_instance" "web2" {
   ami               = var.image_id
   instance_type     = var.instance_type
-  availability_zone = var.availability_zone[1]
+  availability_zone = var.availability_zone[0]
   key_name          = var.keyname[0]
 
   network_interface {
-    network_interface_id = aws_network_interface.web_public1.id
+    network_interface_id = var.web_interface2
     device_index         = 0
   }
 
   user_data = file("apache_install.sh")
 
   tags = {
-    Name = "darl-webserver2"
+    Name = var.Name
   }
 }
 
+*/
 
-# Ec2 for Bastion server with a defined network interface
+
+/*
+
+#Ec2 for Bastion server with a defined network interface
 
 resource "aws_instance" "bastion_server" {
   ami               = var.image_id
   instance_type     = var.instance_type
   availability_zone = var.availability_zone[1]
-  key_name          = var.keyname[1]
+  key_name          = var.keyname[0]
 
   network_interface {
-    network_interface_id = aws_network_interface.bastion_int.id
+    network_interface_id = var.web_interface2
     device_index         = 0
   }
 
@@ -69,53 +76,5 @@ resource "aws_instance" "bastion_server" {
 
 */
 
-
-
-
-/*
-##### Elastic ip to web server public network interface ########
-
-resource "aws_eip" "pub_int" {
-  network_interface = aws_network_interface.web_public.id
-  vpc               = true
-
-}
-
-resource "aws_eip_association" "pub1" {
-  instance_id   = aws_instance.web1.id
-  allocation_id = aws_eip.pub_int.id
-}
-
-
-
-
-# Define / associate an elastic ip to web server2 instance
-
-resource "aws_eip" "pub1_int" {
-  network_interface = aws_network_interface.web_public1.id
-  vpc               = true
-}
-
-resource "aws_eip_association" "pub2" {
-  instance_id   = aws_instance.web2.id
-  allocation_id = aws_eip.pub1_int.id
-}
-
-
-
-######## Elastic IP & association  for bastion server   ##############
-
-resource "aws_eip" "bastion" {
-  network_interface = aws_network_interface.bastion_int.id
-  vpc               = true
-}
-
-
-resource "aws_eip_association" "bastion" {
-  instance_id   = aws_instance.bastion_server.id
-  allocation_id = aws_eip.bastion.id
-}
-
-*/
 
 

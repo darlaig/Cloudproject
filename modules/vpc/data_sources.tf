@@ -6,10 +6,6 @@ id = aws_vpc.dalovpc.id
 }
 
 
-*/
-
-/*
-
 data "aws_subnet_ids" "public" {
   vpc_id = aws_vpc.dalovpc.id
 }
@@ -22,6 +18,8 @@ data "aws_subnet" "public" {
 }
 
 */
+
+
 /*
 
 
